@@ -8,44 +8,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __asyncValues = (this && this.__asyncValues) || function (o) {
-    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
-    var m = o[Symbol.asyncIterator], i;
-    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
-    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
-    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 const storage_blob_1 = require("@azure/storage-blob");
+//function generateBlobSASQueryParameters(blobSASSignatureValues: BlobSASSignatureValues, sharedKeyCredential: StorageSharedKeyCredential)
 const httpTrigger = function (context, req) {
-    var e_1, _a;
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function processed a request.');
-        const name = (req.query.name || (req.body && req.body.name));
+        const blobName = (req.query.name || (req.body && req.body.name));
         //criate storage account client
         const blobServiceClient = storage_blob_1.BlobServiceClient.fromConnectionString(process.env["AZURE_STORAGE_CONNECTION_STRING"]);
+        //create shared key credential
+        const sharedKeyCredential = new storage_blob_1.StorageSharedKeyCredential(process.env["STORAGE_ACCOUNT_NAME"], process.env["STORAGE_ACCOUNT_KEY"]);
         //get contaier client
         const containerName = "content";
         const containerClient = blobServiceClient.getContainerClient(containerName);
+        //get blob client
+        const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+        const blobURL = blockBlobClient.url;
+        /*
         // List the blob(s) in the container
         let blobliststring = "";
-        try {
-            for (var _b = __asyncValues(containerClient.listBlobsFlat()), _c; _c = yield _b.next(), !_c.done;) {
-                const blob = _c.value;
-                blobliststring += blob.name;
-            }
+        for await (const blob of containerClient.listBlobsFlat()) {
+            blobliststring += blob.name;
         }
-        catch (e_1_1) { e_1 = { error: e_1_1 }; }
-        finally {
-            try {
-                if (_c && !_c.done && (_a = _b.return)) yield _a.call(_b);
-            }
-            finally { if (e_1) throw e_1.error; }
-        }
-        const temp = blobliststring;
-        const responseMessage = name
-            ? "Hello, " + name + temp + ". This HTTP triggered function executed successfully."
-            : "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.";
+        */
+        // Generate service level SAS for a blob
+        const blobSAS = storage_blob_1.generateBlobSASQueryParameters({
+            containerName: containerName,
+            blobName: blobName,
+            permissions: storage_blob_1.BlobSASPermissions.parse("r"),
+            expiresOn: new Date(new Date().valueOf() + 86400),
+        }, sharedKeyCredential // StorageSharedKeyCredential - `new StorageSharedKeyCredential(account, accountKey)`
+        ).toString();
+        const responseMessage = blobName
+            ? blobURL + "?" + blobSAS
+            : "please add blob name to query as name";
         context.res = {
             // status: 200, /* Defaults to 200 */
             body: responseMessage
