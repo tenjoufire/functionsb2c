@@ -1,11 +1,31 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
+import {CosmosClient }from "@azure/cosmos"
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');
-    const name = (req.query.name || (req.body && req.body.name));
-    const responseMessage = name
-        ? "Hello, " + name + ". This HTTP triggered function executed successfully."
-        : "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.";
+    const userId = (req.query.userid || (req.body && req.body.userid));
+
+    //create cosmos client
+    const client = new CosmosClient(process.env["COSMOSDB_CONECTION_STRING"]);
+
+    //create database client
+    const database = await client.databases.createIfNotExists({id:"content_metadata"});
+
+    //create container client
+    const container = await database.database.containers.createIfNotExists({id:"metadata"});
+
+    //get file list using ID
+    const queryString = "SELECT c.fileName, c.blobContainerName, c.blobAccountName FROM c JOIN t IN c.readbleUsers WHERE t =\"" + userId + "\"";
+    const filenames = await container.container.items.query(queryString).fetchAll();
+
+    //const filenames = await container.container.items.query(`SELECT * FROM c`).fetchAll();
+
+
+    
+
+    const responseMessage = userId
+        ? filenames
+        : "please enter userid as query";
 
     context.res = {
         // status: 200, /* Defaults to 200 */

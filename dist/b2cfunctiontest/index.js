@@ -9,13 +9,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const cosmos_1 = require("@azure/cosmos");
 const httpTrigger = function (context, req) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function processed a request.');
-        const name = (req.query.name || (req.body && req.body.name));
-        const responseMessage = name
-            ? "Hello, " + name + ". This HTTP triggered function executed successfully."
-            : "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response.";
+        const userId = (req.query.userid || (req.body && req.body.userid));
+        //create cosmos client
+        const client = new cosmos_1.CosmosClient(process.env["COSMOSDB_CONECTION_STRING"]);
+        //create database client
+        const database = yield client.databases.createIfNotExists({ id: "content_metadata" });
+        //create container client
+        const container = yield database.database.containers.createIfNotExists({ id: "metadata" });
+        //get file list using ID
+        const queryString = "SELECT c.fileName, c.blobContainerName, c.blobAccountName FROM c JOIN t IN c.readbleUsers WHERE t =\"" + userId + "\"";
+        const filenames = yield container.container.items.query(queryString).fetchAll();
+        //const filenames = await container.container.items.query(`SELECT * FROM c`).fetchAll();
+        const responseMessage = userId
+            ? filenames
+            : "please enter userid as query";
         context.res = {
             // status: 200, /* Defaults to 200 */
             body: responseMessage

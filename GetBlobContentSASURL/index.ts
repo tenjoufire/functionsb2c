@@ -5,7 +5,7 @@ import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential, BlobSAS
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');
-    const blobName = (req.query.name || (req.body && req.body.name));
+    const blobName = (req.query.blobname || (req.body && req.body.blobname));
 
     //criate storage account client
     const blobServiceClient = BlobServiceClient.fromConnectionString(process.env["AZURE_STORAGE_CONNECTION_STRING"]);
@@ -41,7 +41,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
     const responseMessage = blobName
         ? blobURL + "?" + blobSAS
-        : "please add blob name to query as name";
+        : "please add blob name to query as blobname";
 
     context.res = {
         // status: 200, /* Defaults to 200 */

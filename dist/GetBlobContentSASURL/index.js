@@ -14,7 +14,7 @@ const storage_blob_1 = require("@azure/storage-blob");
 const httpTrigger = function (context, req) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function processed a request.');
-        const blobName = (req.query.name || (req.body && req.body.name));
+        const blobName = (req.query.blobname || (req.body && req.body.blobname));
         //criate storage account client
         const blobServiceClient = storage_blob_1.BlobServiceClient.fromConnectionString(process.env["AZURE_STORAGE_CONNECTION_STRING"]);
         //create shared key credential
@@ -42,7 +42,7 @@ const httpTrigger = function (context, req) {
         ).toString();
         const responseMessage = blobName
             ? blobURL + "?" + blobSAS
-            : "please add blob name to query as name";
+            : "please add blob name to query as blobname";
         context.res = {
             // status: 200, /* Defaults to 200 */
             body: responseMessage
