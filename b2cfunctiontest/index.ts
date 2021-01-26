@@ -14,14 +14,9 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     //create container client
     const container = await database.database.containers.createIfNotExists({id:"metadata"});
 
-    //get file list using ID
+    //get file list using userid
     const queryString = "SELECT c.fileName, c.blobContainerName, c.blobAccountName FROM c JOIN t IN c.readbleUsers WHERE t =\"" + userId + "\"";
     const filenames = await container.container.items.query(queryString).fetchAll();
-
-    //const filenames = await container.container.items.query(`SELECT * FROM c`).fetchAll();
-
-
-    
 
     const responseMessage = userId
         ? filenames

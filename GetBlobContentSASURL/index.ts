@@ -1,5 +1,5 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
-import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential, BlobSASSignatureValues, BlobSASPermissions, generateBlobSASQueryParameters } from "@azure/storage-blob"
+import { BlobServiceClient, StorageSharedKeyCredential, BlobSASPermissions, generateBlobSASQueryParameters } from "@azure/storage-blob"
 
 //function generateBlobSASQueryParameters(blobSASSignatureValues: BlobSASSignatureValues, sharedKeyCredential: StorageSharedKeyCredential)
 
@@ -21,14 +21,6 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     const blockBlobClient = containerClient.getBlockBlobClient(blobName);
     const blobURL = blockBlobClient.url;
 
-    /*
-    // List the blob(s) in the container
-    let blobliststring = "";
-    for await (const blob of containerClient.listBlobsFlat()) {
-        blobliststring += blob.name;
-    }
-    */
-
     // Generate service level SAS for a blob
     const blobSAS = generateBlobSASQueryParameters({
         containerName: containerName, // Required
@@ -49,8 +41,5 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
     };
 
 };
-
-
-
 
 export default httpTrigger;
