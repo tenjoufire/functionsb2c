@@ -1,0 +1,28 @@
+{
+  "bindings": [
+    {
+      "authLevel": "anonymous",
+      "type": "httpTrigger",
+      "direction": "in",
+      "name": "req",
+      "methods": [
+        "get",
+        "post"
+      ]
+    },
+    {
+      "type": "http",
+      "direction": "out",
+      "name": "res"
+    },
+    {
+      "name": "documents",
+      "type": "cosmosDB",
+      "direction": "in",
+      "databaseName": "content_metadata",
+      "collectionName": "metadata",
+      "connectionStringSetting": "COSMOSDB_CONECTION_STRING"
+  }
+  ],
+  "scriptFile": "../dist/GetCosmosDBContentBindTest/index.js"
+}
