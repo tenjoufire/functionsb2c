@@ -25,13 +25,6 @@ const httpTrigger = function (context, req) {
         //get blob client
         const blockBlobClient = containerClient.getBlockBlobClient(blobName);
         const blobURL = blockBlobClient.url;
-        /*
-        // List the blob(s) in the container
-        let blobliststring = "";
-        for await (const blob of containerClient.listBlobsFlat()) {
-            blobliststring += blob.name;
-        }
-        */
         // Generate service level SAS for a blob
         const blobSAS = storage_blob_1.generateBlobSASQueryParameters({
             containerName: containerName,

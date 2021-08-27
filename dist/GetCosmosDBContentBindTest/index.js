@@ -13,8 +13,10 @@ const httpTrigger = function (context, req) {
     return __awaiter(this, void 0, void 0, function* () {
         context.log('HTTP trigger function processed a request.');
         const userId = (req.query.userid || (req.body && req.body.userid));
+        //バインドされたCosmosDBのドキュメントをすべて取得
         const cosmosdbDocuments = context.bindings.documents;
         var resultDocuments = [];
+        //ユーザIDが含まれているものだけを抽出
         for (var i = 0; i < cosmosdbDocuments.length; i++) {
             var document = cosmosdbDocuments[i];
             if (document.readbleUsers.indexOf(userId) >= 0) {

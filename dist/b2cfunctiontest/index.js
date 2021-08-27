@@ -20,10 +20,9 @@ const httpTrigger = function (context, req) {
         const database = yield client.databases.createIfNotExists({ id: "content_metadata" });
         //create container client
         const container = yield database.database.containers.createIfNotExists({ id: "metadata" });
-        //get file list using ID
+        //get file list using userid
         const queryString = "SELECT c.fileName, c.blobContainerName, c.blobAccountName FROM c JOIN t IN c.readbleUsers WHERE t =\"" + userId + "\"";
         const filenames = yield container.container.items.query(queryString).fetchAll();
-        //const filenames = await container.container.items.query(`SELECT * FROM c`).fetchAll();
         const responseMessage = userId
             ? filenames
             : "please enter userid as query";

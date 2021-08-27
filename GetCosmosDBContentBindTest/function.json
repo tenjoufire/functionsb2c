@@ -21,6 +21,7 @@
       "direction": "in",
       "databaseName": "content_metadata",
       "collectionName": "metadata",
+      "sqlQuery": "SELECT c.fileName, c.blobContainerName, c.blobAccountName FROM c JOIN t IN c.readbleUsers WHERE t = {userid}",
       "connectionStringSetting": "COSMOSDB_CONECTION_STRING"
   }
   ],
